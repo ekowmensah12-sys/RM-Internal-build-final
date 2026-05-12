@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Sales — Retail Media Internal Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0d1117;
+  --navy:#0d1b2a;
+  --green:#1d9e75;
+  --green-light:#e6f9f2;
+  --green-dark:#0f6e56;
+  --gold:#f0a500;
+  --gold-bg:#2a1e00;
+  --border:#e5e9ef;
+  --surface:#f7f8fa;
+  --text:#1a1a1a;
+  --muted:#777;
+  --label:#444;
+  --red:#e24b4a;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);font-size:14px;line-height:1.5}
+
+/* ── Header ── */
+#site-header{background:var(--black);border-bottom:2px solid var(--green);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+#site-header .logo{color:#fff;font-size:11px;font-weight:700;letter-spacing:5px;font-family:'DM Mono',monospace}
+#site-header h1{color:#fff;font-size:13px;font-weight:500;opacity:.85}
+#site-header .badge{background:var(--green);color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.04em}
+
+/* ── Page layout ── */
+#page{max-width:1160px;margin:0 auto;padding:28px 20px 80px;display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+@media(max-width:860px){#page{grid-template-columns:1fr}}
+
+/* ── Stepper ── */
+.step-bar{display:flex;align-items:center;gap:0;margin-bottom:24px;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.step{flex:1;display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:12px;font-weight:500;color:#aaa;border-right:1px solid var(--border);transition:all .2s;position:relative}
+.step:last-child{border-right:none}
+.step.active{color:var(--green);background:var(--green-light)}
+.step.done{color:var(--green-dark);background:#f0fdf8}
+.step.done::after{content:'✓';position:absolute;right:12px;font-size:11px;color:var(--green)}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--border);color:#999;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.step.active .step-num{background:var(--green);color:#fff}
+.step.done .step-num{background:var(--green-dark);color:#fff}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+.card-title{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.frow.three{grid-template-columns:1fr 1fr 1fr}
+.frow.full{grid-template-columns:1fr}
+.fg label{display:block;font-size:11px;font-weight:600;color:var(--label);margin-bottom:4px;letter-spacing:.02em}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--green)}
+.fg textarea{resize:vertical;min-height:56px}
+
+/* ── Step panels ── */
+.step-panel{display:none}
+.step-panel.active{display:block}
+
+/* ── Trade Calendar ── */
+.cal-month-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.cal-month-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .15s}
+.cal-month-tab:hover{border-color:var(--green);color:var(--green)}
+.cal-month-tab.active{background:var(--green);border-color:var(--green);color:#fff}
+
+.activity-grid{display:none;margin-bottom:0}
+.activity-grid.active{display:block}
+.activity-label{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.activity-list{display:flex;flex-direction:column;gap:4px}
+.activity-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all .15s;background:#fff}
+.activity-item:hover{border-color:var(--green);background:var(--green-light)}
+.activity-item.selected{border-color:var(--green);background:var(--green-light)}
+.activity-item.payday-item{border-color:#d4a017;background:#fffbf0}
+.activity-item.selected.payday-item{border-color:var(--gold);background:#fff8e6}
+.ai-check{width:16px;height:16px;border-radius:4px;border:2px solid #dde1e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.activity-item.selected .ai-check{background:var(--green);border-color:var(--green)}
+.activity-item.selected .ai-check::after{content:'✓';color:#fff;font-size:9px;font-weight:700}
+.ai-date{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);width:52px;flex-shrink:0}
+.ai-theme{font-size:12px;font-weight:500;color:var(--text);flex:1}
+.ai-event{font-size:11px;color:var(--muted);flex:1}
+.ai-payday{font-size:10px;font-weight:700;color:var(--gold);background:rgba(240,165,0,.12);padding:2px 6px;border-radius:8px}
+.cal-hint{font-size:11px;color:var(--green);font-style:italic;margin-top:8px}
+
+/* ── Step nav buttons ── */
+.step-nav{display:flex;gap:8px;margin-top:16px}
+.btn-next{padding:10px 20px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s}
+.btn-next:hover{background:#1a3550}
+.btn-back{padding:10px 16px;background:#fff;color:var(--muted);border:1px solid var(--border);border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-back:hover{border-color:#aaa;color:var(--text)}
+
+/* ── Section headers ── */
+.psec{margin-bottom:20px}
+.psec-header{margin-bottom:4px}
+.psec h2{font-size:14px;font-weight:700;color:var(--navy)}
+.psec .sdesc{font-size:12px;color:var(--muted);margin-bottom:10px}
+
+/* ── Product cards ── */
+.pcard{background:#fff;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.pcard:hover{border-color:#a8b8c8;box-shadow:0 3px 10px rgba(0,0,0,.08);transform:translateY(-1px)}
+.pcard.sel{border-color:var(--green);background:#f4fcf9;box-shadow:0 2px 10px rgba(29,158,117,.12)}
+.ptop{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;cursor:pointer}
+.pcheck{width:22px;height:22px;border-radius:50%;border:2px solid #d0d8e4;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pcard.sel .pcheck{background:var(--green);border-color:var(--green)}
+.pcheck svg{display:none}
+.pcard.sel .pcheck svg{display:block}
+.pbody{flex:1}
+.ptitle{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+.pdesc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.55}
+.pmeta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
+.pprice{font-size:15px;font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.pimps{font-size:10px;color:#666;background:#eef0f4;padding:3px 8px;border-radius:8px;font-weight:500}
+.ptag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px}
+.ptag-gold{background:#fff3d0;color:#7a5200}
+.ptag-silver{background:#f0f2f5;color:#555}
+.ptag-bronze{background:#f5ece0;color:#7a4a1e}
+.ptag-sponsored{background:#e8f0fe;color:#1a56a8}
+
+.pdates{padding:0 14px 12px;border-top:1px solid #f0f4f8;padding-top:11px;display:none}
+.pcard.sel .pdates{display:block}
+.drow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.drow.three{grid-template-columns:1fr 1fr 1fr}
+.drow.full{grid-template-columns:1fr}
+.dg label{font-size:11px;font-weight:600;color:var(--label);display:block;margin-bottom:3px}
+.dg select,.dg input{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);background:#fff;outline:none;transition:border-color .15s}
+.dg select:focus,.dg input:focus{border-color:var(--green)}
+.dhint{font-size:11px;color:var(--green);font-style:italic;margin-top:5px}
+.payday-toggle{display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:#fffbf2;border-radius:6px;border:1px solid #f5dfa0}
+.payday-toggle label{font-size:12px;color:#6b4c00;flex:1}
+.payday-toggle input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold)}
+.payday-extra{font-size:11px;color:var(--gold);font-weight:600}
+.align-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+
+/* ── Sidebar ── */
+#sidebar{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;position:sticky;top:68px;max-height:calc(100vh - 88px);overflow-y:auto;display:flex;flex-direction:column}
+.sb-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sb-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#ccc;font-size:12px;gap:6px;padding:28px 0}
+.sb-items{flex:1;overflow-y:auto}
+.sbitem{padding:7px 0;border-bottom:1px solid #f2f4f7;display:flex;align-items:flex-start;gap:6px}
+.sbi-name{font-size:12px;font-weight:600;color:var(--text)}
+.sbi-sub{font-size:10px;color:#aaa;margin-top:1px}
+.sbi-price{font-size:12px;font-weight:700;color:var(--navy);white-space:nowrap}
+.sbi-rm{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:0;line-height:1}
+.sbi-rm:hover{color:var(--red)}
+.sb-totals{border-top:2px solid var(--border);padding-top:12px;margin-top:6px}
+.trow{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+.trow.big{font-size:15px;font-weight:700;color:var(--text);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.bstat{border-radius:7px;padding:7px 12px;font-size:11px;font-weight:500;margin:8px 0;text-align:center}
+.bs-ok{background:var(--green-light);color:var(--green-dark)}
+.bs-over{background:#fde8e8;color:#a32d2d}
+.bs-neutral{background:#f3f4f6;color:#999}
+.gen-btn{width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif;transition:background .15s}
+.gen-btn:hover{background:#1a3550}
+.gen-btn:disabled{background:#c0c8d0;cursor:not-allowed}
+.sub-btn{width:100%;padding:10px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif;transition:background .15s}
+.sub-btn:hover{background:var(--green-dark)}
+.sub-btn:disabled{background:#b0d4c8;cursor:not-allowed}
+
+/* ── Success overlay ── */
+.soverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.soverlay.show{display:flex}
+.sbox{background:#fff;border-radius:12px;padding:32px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.sbox h2{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.sbox p{font-size:13px;color:#666;line-height:1.6;margin-bottom:12px}
+.sref{font-size:16px;font-weight:700;color:var(--green);letter-spacing:2px;margin-bottom:12px;font-family:'DM Mono',monospace}
+.scls{background:var(--navy);color:#fff;border:none;border-radius:7px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── Upload zone ── */
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:14px}
+.upload-zone:hover{border-color:var(--green)}
+.upload-zone p{font-size:11px;color:#aaa;margin-top:5px}
+.upload-zone input{display:none}
+
+/* ── Season pills ── */
+.season-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.season-pill{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.season-pill:hover{border-color:var(--green);color:var(--green)}
+.season-pill.active{background:var(--green);border-color:var(--green);color:#fff}
+
+.step-nav-top{margin-top:0;margin-bottom:16px}
+
+/* ── Section divider — bold ad-type headers ── */
+.sec-divider{display:flex;align-items:center;gap:12px;margin:24px 0 14px}
+.sec-divider span{font-size:13px;font-weight:700;color:var(--navy);letter-spacing:-.01em;white-space:nowrap;background:var(--navy);color:#fff;padding:5px 14px;border-radius:20px}
+.sec-divider::before,.sec-divider::after{content:'';flex:1;height:1.5px;background:var(--border)}
+</style>
+</head>
+<body>
+
+<div id="site-header">
+  <span class="logo">SECRET SALES</span>
+  <h1>Retail Media — Internal Campaign Planner</h1>
+  <span class="badge">Internal Use Only</span>
+</div>
+
+<div id="page">
+<div id="main">
+
+<!-- Step bar -->
+<div class="step-bar">
+  <div class="step active" id="step-tab-1"><div class="step-num">1</div>Campaign details</div>
+  <div class="step" id="step-tab-2"><div class="step-num">2</div>Trade calendar</div>
+  <div class="step" id="step-tab-3"><div class="step-num">3</div>Add products</div>
+  <div class="step" id="step-tab-4"><div class="step-num">4</div>Review &amp; submit</div>
+</div>
+
+<!-- ───────────────── STEP 1: Campaign Details ───────────────── -->
+<div class="step-panel active" id="panel-1">
+  <div class="step-nav step-nav-top">
+    <button class="btn-next" onclick="goStep(2)">Next: Trade calendar →</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Campaign details</div>
+    <div class="frow three">
+      <div class="fg"><label>Point of Contact (PoC)</label>
+        <select id="pocSelect" onchange="onPocChange()">
+          <option value="">Select PoC</option>
+          <option value="anna" data-market="uk">Anna Petrie</option>
+          <option value="cat" data-market="uk">Cat</option>
+          <option value="charlotte" data-market="vd">Charlotte Brattinga</option>
+          <option value="dan" data-market="uk">Dan Cato</option>
+          <option value="ekow" data-market="uk">Ekow Mensah</option>
+          <option value="lizzy" data-market="uk">Lizzy Hodges</option>
+          <option value="matt" data-market="uk">Matt Purt</option>
+          <option value="paul" data-market="uk">Paul Smallpage</option>
+          <option value="rachel" data-market="uk">Rachel Harrison</option>
+          <option value="rupal" data-market="de">Rupal</option>
+          <option value="sian" data-market="uk">Sian Jones</option>
+          <option value="stefan" data-market="de">Stefan Sommer</option>
+          <option value="tom" data-market="vd">Tom Kelly</option>
+        </select>
+      </div>
+      <div class="fg"><label>Partner / Brand name</label><input type="text" id="brandName" placeholder="e.g. Coach"></div>
+      <div class="fg"><label>Market</label>
+        <select id="mktSelect">
+          <option value="uk">Secret Sales UK</option>
+          <option value="vd">V&amp;D</option>
+          <option value="tbd">To Be Dressed</option>
+          <option value="de">Secret Sales DE</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow full">
+      <div class="fg"><label>Budget (£)</label><input type="number" id="budgetInput" placeholder="e.g. 20000" oninput="updateBudgetStatus()"></div>
+    </div>
+    <div class="frow full">
+      <div class="fg"><label>Campaign objective / notes</label><textarea id="campaignNotes" placeholder="e.g. Brand awareness for new leather collection, target womenswear audience"></textarea></div>
+    </div>
+  </div>
+  <div class="step-nav">
+    <button class="btn-next" onclick="goStep(2)">Next: Trade calendar →</button>
+  </div>
+</div>
+
+<!-- ───────────────── STEP 2: Trade Calendar ───────────────── -->
+<div class="step-panel" id="panel-2">
+  <div class="step-nav step-nav-top">
+    <button class="btn-back" onclick="goStep(1)">← Back</button>
+    <button class="btn-next" onclick="goStep(3)">Next: Add products →</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Trade calendar — select relevant activity weeks</div>
+
+    <div class="upload-zone" onclick="document.getElementById('calUpload').click()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin:0 auto;display:block"><path d="M12 15V3M12 3L8 7M12 3L16 7" stroke="#9db3c8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17v1a3 3 0 003 3h12a3 3 0 003-3v-1" stroke="#9db3c8" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <p>Upload updated trade calendar (.xlsx) to refresh weeks · or use built-in data below</p>
+      <input type="file" id="calUpload" accept=".xlsx" onchange="handleCalUpload(event)">
+    </div>
+
+    <!-- Month tabs -->
+    <div class="fg" style="margin-bottom:14px">
+      <label>Select months <span style="font-weight:400;color:#aaa">(pick one or more)</span></label>
+      <div class="cal-month-tabs" id="monthTabs"></div>
+    </div>
+
+    <!-- Activity weeks per month -->
+    <div id="activityContainer">
+      <div style="font-size:12px;color:#bbb;text-align:center;padding:20px 0">Select a month above to view trade activity</div>
+    </div>
+
+    <div id="selWeeksHint" class="cal-hint" style="display:none"></div>
+  </div>
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(1)">← Back</button>
+    <button class="btn-next" onclick="goStep(3)">Next: Add products →</button>
+  </div>
+</div>
+
+<!-- ───────────────── STEP 3: Products ───────────────── -->
+<div class="step-panel" id="panel-3">
+  <div class="step-nav step-nav-top">
+    <button class="btn-back" onclick="goStep(2)">← Back</button>
+    <button class="btn-next" onclick="goStep(4)">Next: Review &amp; submit →</button>
+  </div>
+
+  <!-- Sponsored Ads -->
+  <div class="sec-divider"><span>Sponsored Ads</span></div>
+  <div class="psec">
+    <p class="sdesc">AI-powered sponsored placements across search, category and competitor pages. Self-serve or managed packages.</p>
+
+    <div class="pcard" id="card-catads">
+      <div class="ptop" onclick="toggle('catads')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Category ads (Gold)</div>
+          <div class="pdesc">Sponsored product placement across category, search and competitor pages. Year-long AI-based targeting. Fully set up and managed.</div>
+          <div class="pmeta"><span class="pprice">£3,000 / month</span><span class="pimps">1M+ weekly reach</span><span class="ptag ptag-gold">Gold</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-catads">
+        <div class="drow">
+          <div class="dg"><label>Start month</label><select id="start-catads" onchange="spMonths('catads',3000)"></select></div>
+          <div class="dg"><label>End month</label><select id="end-catads" onchange="spMonths('catads',3000)"></select></div>
+        </div>
+        <div class="dhint" id="hint-catads">Select start and end month</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-catsilver">
+      <div class="ptop" onclick="toggle('catsilver')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Category ads (Silver)</div>
+          <div class="pdesc">Sponsored product placement across category and search pages. Set up and managed.</div>
+          <div class="pmeta"><span class="pprice">£2,000 / month</span><span class="pimps">500k+ weekly reach</span><span class="ptag ptag-silver">Silver</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-catsilver">
+        <div class="drow">
+          <div class="dg"><label>Start month</label><select id="start-catsilver" onchange="spMonths('catsilver',2000)"></select></div>
+          <div class="dg"><label>End month</label><select id="end-catsilver" onchange="spMonths('catsilver',2000)"></select></div>
+        </div>
+        <div class="dhint" id="hint-catsilver">Select start and end month</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-catbronze">
+      <div class="ptop" onclick="toggle('catbronze')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Category ads (Bronze)</div>
+          <div class="pdesc">Sponsored product placement on category pages only. Set up included.</div>
+          <div class="pmeta"><span class="pprice">£1,000 / month</span><span class="pimps">250k+ weekly reach</span><span class="ptag ptag-bronze">Bronze</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-catbronze">
+        <div class="drow">
+          <div class="dg"><label>Start month</label><select id="start-catbronze" onchange="spMonths('catbronze',1000)"></select></div>
+          <div class="dg"><label>End month</label><select id="end-catbronze" onchange="spMonths('catbronze',1000)"></select></div>
+        </div>
+        <div class="dhint" id="hint-catbronze">Select start and end month</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email ads -->
+  <div class="sec-divider"><span>Email ads</span></div>
+  <div class="psec">
+    <p class="sdesc">Reach up to 1.5M shoppers. Boosts visibility 8–12x.</p>
+
+    <div class="pcard" id="card-emailauto">
+      <div class="ptop" onclick="toggle('emailauto')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Automated emails</div>
+          <div class="pdesc">Browse abandonment, cart recovery and category retargeting. Personalised to intent. 3 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£6,000 / week</span><span class="pimps">Up to 1.5M reach</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-emailauto">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-emailauto" onchange="weekChanged('emailauto')"></select></div>
+          <div class="dg"><label>Which week (of 3)</label><select id="wk-emailauto"><option>Week 1</option><option>Week 2</option><option>Week 3</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-emailauto" onchange="calcTotal('emailauto',6000)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-emailauto"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-emailauto" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-emailauto" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-emailauto" onchange="calcTotal('emailauto',6000)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-emailauto">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-emailbau">
+      <div class="ptop" onclick="toggle('emailbau')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">BAU email banners</div>
+          <div class="pdesc">Full-width banner in regular broadcast emails. 4 separate weeks per year. Avg CVR 2–4%.</div>
+          <div class="pmeta"><span class="pprice">£6,000 / week</span><span class="pimps">Up to 1M reach</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-emailbau">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-emailbau" onchange="weekChanged('emailbau')"></select></div>
+          <div class="dg"><label>Which week (of 4)</label><select id="wk-emailbau"><option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-emailbau" onchange="calcTotal('emailbau',6000)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option><option value="4">4 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-emailbau"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-emailbau" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-emailbau" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-emailbau" onchange="calcTotal('emailbau',6000)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-emailbau">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-emailpost">
+      <div class="ptop" onclick="toggle('emailpost')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Post purchase emails</div>
+          <div class="pdesc">Strengthen loyalty by reaching customers after purchase. Highly targeted, high-intent audience. 3 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£6,000 / week</span><span class="pimps">100k reach</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-emailpost">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-emailpost" onchange="weekChanged('emailpost')"></select></div>
+          <div class="dg"><label>Which week (of 3)</label><select id="wk-emailpost"><option>Week 1</option><option>Week 2</option><option>Week 3</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-emailpost" onchange="calcTotal('emailpost',6000)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-emailpost"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-emailpost" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-emailpost" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-emailpost" onchange="calcTotal('emailpost',6000)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-emailpost">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-emailsolus">
+      <div class="ptop" onclick="toggle('emailsolus')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Solus email</div>
+          <div class="pdesc">Full email dedicated to your brand. 100% inbox focus. 2 sends per year, 750k–1M reach per send.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / send</span><span class="pimps">750k–1M reach</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-emailsolus">
+        <div class="drow three">
+          <div class="dg"><label>Preferred send date</label><input type="date" id="start-emailsolus"></div>
+          <div class="dg"><label>Which send (of 2)</label><select id="wk-emailsolus"><option>Send 1</option><option>Send 2</option></select></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-emailsolus"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Homepage ads -->
+  <div class="sec-divider"><span>Homepage ads</span></div>
+  <div class="psec">
+    <p class="sdesc">High-impact homepage placements. Boosts visibility by up to 10x.</p>
+
+    <div class="pcard" id="card-bannerstrip">
+      <div class="ptop" onclick="toggle('bannerstrip')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Banner strip</div>
+          <div class="pdesc">High-performing homepage placement with tailored messaging. 4 separate weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">150k–300k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-bannerstrip">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-bannerstrip" onchange="weekChanged('bannerstrip')"></select></div>
+          <div class="dg"><label>Which week (of 4)</label><select id="wk-bannerstrip"><option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-bannerstrip" onchange="calcTotal('bannerstrip',5500)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option><option value="4">4 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-bannerstrip"><option value="">Select alignment</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-bannerstrip" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-bannerstrip" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-bannerstrip" onchange="calcTotal('bannerstrip',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-bannerstrip">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-brandblock">
+      <div class="ptop" onclick="toggle('brandblock')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Brand block</div>
+          <div class="pdesc">Trending brand content block on homepage. One of our best-selling placements. 4 separate weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">150k–300k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-brandblock">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-brandblock" onchange="weekChanged('brandblock')"></select></div>
+          <div class="dg"><label>Which week (of 4)</label><select id="wk-brandblock"><option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-brandblock" onchange="calcTotal('brandblock',5500)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option><option value="4">4 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-brandblock"><option value="">Select alignment</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-brandblock" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-brandblock" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-brandblock" onchange="calcTotal('brandblock',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-brandblock">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-brandrail">
+      <div class="ptop" onclick="toggle('brandrail')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Brand rail</div>
+          <div class="pdesc">Feature your offer on homepage with a strong call-to-action bubble. 3 separate weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">600k–850k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-brandrail">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-brandrail" onchange="weekChanged('brandrail')"></select></div>
+          <div class="dg"><label>Which week (of 3)</label><select id="wk-brandrail"><option>Week 1</option><option>Week 2</option><option>Week 3</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-brandrail" onchange="calcTotal('brandrail',5500)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-brandrail"><option value="">Select alignment</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-brandrail" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-brandrail" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-brandrail" onchange="calcTotal('brandrail',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-brandrail">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-hero">
+      <div class="ptop" onclick="toggle('hero')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Homepage hero</div>
+          <div class="pdesc">Top of homepage — highest converting placement. 2-day slot. Maximum impact for launches.</div>
+          <div class="pmeta"><span class="pprice">£7,500 / slot</span><span class="pimps">600k–850k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-hero">
+        <div class="drow">
+          <div class="dg"><label>Start date (2-day slot)</label><input type="date" id="start-hero" onchange="heroDate()"></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-hero"><option value="">Select alignment</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+        </div>
+        <div class="dhint" id="hint-hero">End date auto-calculated</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-hpstrip">
+      <div class="ptop" onclick="toggle('hpstrip')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Homepage USP bar</div>
+          <div class="pdesc">Top of homepage above hero banner. Maximum visibility placement. 2 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">400k–500k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-hpstrip">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-hpstrip" onchange="weekChanged('hpstrip')"></select></div>
+          <div class="dg"><label>Which week (of 2)</label><select id="wk-hpstrip"><option>Week 1</option><option>Week 2</option></select></div>
+          <div class="dg"><label>Weeks to book</label><select id="qty-hpstrip" onchange="calcTotal('hpstrip',5500)"><option value="1">1 week</option><option value="2">2 weeks</option></select></div>
+        </div>
+        <div class="align-row">
+          <div class="dg"><label>Campaign alignment</label><select id="align-hpstrip"><option value="">Select alignment</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+          <div class="dg"><label>Trade theme this week</label><input type="text" id="theme-hpstrip" readonly style="background:#f7f8fa;color:#888;font-size:11px" placeholder="Select a week to see theme"></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-hpstrip" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-hpstrip" onchange="calcTotal('hpstrip',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-hpstrip">Select a week to continue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post checkout -->
+  <div class="sec-divider"><span>Post checkout</span></div>
+  <div class="psec">
+    <p class="sdesc">Best for promotions and limited-time offers. Increases conversions by 5–10%.</p>
+
+    <div class="pcard" id="card-checkout">
+      <div class="ptop" onclick="toggle('checkout')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Checkout banner</div>
+          <div class="pdesc">Visible banner on checkout pages promoting offers. 2 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">100k–200k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-checkout">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-checkout" onchange="weekChanged('checkout')"></select></div>
+          <div class="dg"><label>Weeks to book (max 2)</label><select id="qty-checkout" onchange="calcTotal('checkout',5500)"><option value="1">1 week</option><option value="2">2 weeks</option></select></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-checkout"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-checkout" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-checkout" onchange="calcTotal('checkout',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-checkout">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-orderconf">
+      <div class="ptop" onclick="toggle('orderconf')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Order confirmation banner</div>
+          <div class="pdesc">Banner ad on order confirmed page. High-intent, post-purchase moment. 2 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£8,000 / week</span><span class="pimps">100k–200k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-orderconf">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-orderconf" onchange="weekChanged('orderconf')"></select></div>
+          <div class="dg"><label>Weeks to book (max 2)</label><select id="qty-orderconf" onchange="calcTotal('orderconf',8000)"><option value="1">1 week</option><option value="2">2 weeks</option></select></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-orderconf"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-orderconf" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-orderconf" onchange="calcTotal('orderconf',8000)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-orderconf">Select a week to continue</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-postcheckout">
+      <div class="ptop" onclick="toggle('postcheckout')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Post-checkout pop-up</div>
+          <div class="pdesc">Pop-up message shown immediately after purchase. High-intent moment. 2 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">100k–200k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-postcheckout">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-postcheckout" onchange="weekChanged('postcheckout')"></select></div>
+          <div class="dg"><label>Weeks to book (max 2)</label><select id="qty-postcheckout" onchange="calcTotal('postcheckout',5500)"><option value="1">1 week</option><option value="2">2 weeks</option></select></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-postcheckout"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-postcheckout" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-postcheckout" onchange="calcTotal('postcheckout',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-postcheckout">Select a week to continue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product pages -->
+  <div class="sec-divider"><span>Product pages</span></div>
+  <div class="psec">
+    <p class="sdesc">Drives engagement across search, category and product detail pages. Increases new customers by up to 25%.</p>
+
+    <div class="pcard" id="card-pdpcomp">
+      <div class="ptop" onclick="toggle('pdpcomp')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">PDP competitor ad</div>
+          <div class="pdesc">Ad placement on competitor product detail pages. Year-long AI-based targeting.</div>
+          <div class="pmeta"><span class="pprice">£12,000 / year</span><span class="pimps">150k–300k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-pdpcomp">
+        <div class="drow">
+          <div class="dg"><label>Start month</label><select id="start-pdpcomp" onchange="spMonths('pdpcomp',1000)"></select></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-pdpcomp"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Additional driver</option></select></div>
+        </div>
+        <div class="dhint" id="hint-pdpcomp">Year-long placement — £12,000 fixed</div>
+      </div>
+    </div>
+
+    <div class="pcard" id="card-searchcontent">
+      <div class="ptop" onclick="toggle('searchcontent')">
+        <div class="pcheck"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5L4 7.5L10 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pbody">
+          <div class="ptitle">Search content block</div>
+          <div class="pdesc">Featured content placement at top of search results. 8 weeks per year.</div>
+          <div class="pmeta"><span class="pprice">£5,500 / week</span><span class="pimps">200k–400k weekly impressions</span></div>
+        </div>
+      </div>
+      <div class="pdates" id="dates-searchcontent">
+        <div class="drow three">
+          <div class="dg"><label>Week commencing</label><select id="week-searchcontent" onchange="weekChanged('searchcontent')"></select></div>
+          <div class="dg"><label>Weeks to book (max 8)</label><select id="qty-searchcontent" onchange="calcTotal('searchcontent',5500)"><option value="1">1 week</option><option value="2">2 weeks</option><option value="3">3 weeks</option><option value="4">4 weeks</option><option value="5">5 weeks</option><option value="6">6 weeks</option><option value="7">7 weeks</option><option value="8">8 weeks</option></select></div>
+          <div class="dg"><label>Campaign alignment</label><select id="align-searchcontent"><option value="">Select</option><option>Key dates</option><option>USP message</option><option>Hero banner</option><option>Additional driver</option></select></div>
+        </div>
+        <div class="payday-toggle" id="pd-toggle-searchcontent" style="display:none">
+          <label>Payday week — add £1,000 premium?</label>
+          <input type="checkbox" id="pd-searchcontent" onchange="calcTotal('searchcontent',5500)">
+          <span class="payday-extra">+£1,000</span>
+        </div>
+        <div class="dhint" id="hint-searchcontent">Select a week to continue</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(2)">← Back</button>
+    <button class="btn-next" onclick="goStep(4)">Next: Review &amp; submit →</button>
+  </div>
+</div>
+
+<!-- ───────────────── STEP 4: Review & Submit ───────────────── -->
+<div class="step-panel" id="panel-4">
+  <div class="step-nav step-nav-top">
+    <button class="btn-back" onclick="goStep(3)">← Back</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Review campaign plan</div>
+    <div id="review-content" style="font-size:13px;color:var(--muted);padding:8px 0">Select products in step 3 to see your plan here.</div>
+  </div>
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+</div><!-- end #main -->
+
+<!-- ───────────────── SIDEBAR ───────────────── -->
+<div id="sidebar">
+  <div class="sb-title">Campaign plan <span style="font-size:11px;color:#aaa;font-weight:400" id="brandBadge"></span></div>
+  <div id="sb-empty" class="sb-empty">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#e5e9ef" stroke-width="1.5"/><path d="M8 14h12M14 8v12" stroke="#ddd" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Select products to build your campaign plan
+  </div>
+  <div id="sb-items" class="sb-items" style="display:none"></div>
+  <div id="sb-totals" class="sb-totals" style="display:none">
+    <div class="trow"><span>Subtotal</span><span id="subtot">—</span></div>
+    <div class="trow big"><span>Total</span><span id="grandtot">—</span></div>
+    <div id="bstat" class="bstat bs-neutral">Enter budget above to track spend</div>
+    <button class="gen-btn" id="genBtn" onclick="generateProposal()" disabled>Generate proposal (PPTX)</button>
+    <button class="sub-btn" id="subBtn" onclick="doSubmit()" disabled>Submit to Ekow</button>
+  </div>
+</div>
+
+</div><!-- end #page -->
+
+<!-- Success overlay -->
+<div class="soverlay" id="soverlay">
+  <div class="sbox">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" style="margin:0 auto 14px;display:block"><circle cx="22" cy="22" r="22" fill="#e6f9f2"/><path d="M12 22L18.5 29L32 14" stroke="#1d9e75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2>Campaign submitted</h2>
+    <p>Plan sent to Ekow Mensah for review. Reference number below.</p>
+    <div class="sref" id="refNo">SS-RM-0000</div>
+    <p style="font-size:12px;color:#aaa;margin-bottom:18px">Submitted by <span id="confBdm" style="color:#666"></span></p>
+    <button class="scls" onclick="document.getElementById('soverlay').classList.remove('show')">Done</button>
+  </div>
+</div>
+
+<script>
+const EKOW = 'ekow.mensah@secretsales.com';
+let currentStep = 1;
+
+const POC_MARKETS = {
+  anna:'uk', cat:'uk', charlotte:'vd', dan:'uk', ekow:'uk',
+  lizzy:'uk', matt:'uk', paul:'uk', rachel:'uk', rupal:'de',
+  sian:'uk', stefan:'de', tom:'vd'
+};
+
+const TRADE_CAL = {
+  '2026-05-04': {event:'May Day bank holiday', theme:'Spring / Summer new season', payday:false},
+  '2026-05-11': {event:'New season sunglasses launch', theme:'SUMMER READY STYLES | UP TO 80% OFF', payday:false},
+  '2026-05-18': {event:'', theme:'Summer styles', payday:false},
+  '2026-05-25': {event:'Whit Monday bank holiday', theme:'Summer sale build-up', payday:true},
+  '2026-06-01': {event:'SPLIT PAYDAY — Sale activity begins', theme:'SUMMER SALE - UP TO 80% OFF EVERYTHING', payday:true},
+  '2026-06-08': {event:'Summer sale running', theme:'Summer sale — up to 80% off everything', payday:false},
+  '2026-06-15': {event:'Standard delivery cut-off', theme:'Summer sale — last chance', payday:false},
+  '2026-06-22': {event:'', theme:'Summer styles / new season', payday:false},
+  '2026-06-29': {event:'', theme:'Summer styles / back to school build', payday:false},
+  '2026-07-06': {event:'', theme:'Back to school / summer sale', payday:false},
+  '2026-07-13': {event:'Start talking back to school', theme:'BTS early messaging', payday:true},
+  '2026-07-20': {event:'Back to school activity', theme:'BTS / summer clearance', payday:false},
+  '2026-07-27': {event:'', theme:'Summer clearance / BTS', payday:false},
+  '2026-08-03': {event:'Bank holiday', theme:'BTS / autumn preview', payday:false},
+  '2026-08-10': {event:'', theme:'Autumn/winter new season preview', payday:false},
+  '2026-08-17': {event:'', theme:'AW new season', payday:true},
+  '2026-08-24': {event:'', theme:'AW new season / BTS', payday:false},
+  '2026-08-31': {event:'Bank holiday', theme:'AW new season', payday:false},
+  '2026-09-07': {event:'', theme:'AW full price / new season', payday:false},
+  '2026-09-14': {event:'', theme:'AW new season', payday:false},
+  '2026-09-21': {event:'', theme:'AW sale build', payday:true},
+  '2026-09-28': {event:'', theme:'AW styles / gifting preview', payday:false},
+  '2026-10-05': {event:'', theme:'AW styles / gifting', payday:false},
+  '2026-10-12': {event:'', theme:'AW gifting / Halloween build', payday:false},
+  '2026-10-19': {event:'Half term', theme:'Halloween / gifting', payday:false},
+  '2026-10-26': {event:'Halloween', theme:'Halloween / gifting / BF preview', payday:true},
+  '2026-11-02': {event:'', theme:'Black Friday build', payday:false},
+  '2026-11-09': {event:'', theme:'Black Friday / Cyber Monday', payday:false},
+  '2026-11-16': {event:'', theme:'Black Friday peak', payday:false},
+  '2026-11-23': {event:'Black Friday', theme:'Black Friday / Cyber Monday', payday:false},
+  '2026-11-30': {event:'Cyber Monday', theme:'Cyber week / Christmas build', payday:true},
+  '2026-12-07': {event:'Christmas delivery cut-offs start', theme:'Christmas gifting peak', payday:false}
+};
+
+let sel = {};
+let selectedWeeks = new Set();
+
+// ── Step navigation ──
+function goStep(n) {
+  const prev = currentStep;
+  document.getElementById('panel-'+prev).classList.remove('active');
+  const prevTab = document.getElementById('step-tab-'+prev);
+  prevTab.classList.remove('active');
+  // Mark as done only if going forward
+  if(n > prev) prevTab.classList.add('done');
+  else prevTab.classList.remove('done');
+  currentStep = n;
+  const newTab = document.getElementById('step-tab-'+n);
+  newTab.classList.add('active');
+  newTab.classList.remove('done');
+  document.getElementById('panel-'+n).classList.add('active');
+  if(n===4) buildReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Season multi-select ──
+let selectedSeasons = new Set();
+function toggleSeason(btn) {
+  const val = btn.dataset.val;
+  if(selectedSeasons.has(val)){selectedSeasons.delete(val);btn.classList.remove('active');}
+  else{selectedSeasons.add(val);btn.classList.add('active');}
+}
+function getSelectedSeasons() {
+  return selectedSeasons.size ? [...selectedSeasons].join(', ') : 'Not specified';
+}
+
+// ── PoC ──
+function onPocChange() {
+  const poc = document.getElementById('pocSelect').value;
+  if (POC_MARKETS[poc]) document.getElementById('mktSelect').value = POC_MARKETS[poc];
+}
+
+// ── Trade calendar: multi-select month tabs ──
+let selectedMonths = new Set();
+
+function buildMonthTabs() {
+  const months = {};
+  Object.keys(TRADE_CAL).forEach(wc => {
+    const d = new Date(wc);
+    const key = wc.slice(0,7);
+    const label = d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    if(!months[key]) months[key] = label;
+  });
+  const container = document.getElementById('monthTabs');
+  Object.entries(months).forEach(([key, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'cal-month-tab';
+    btn.textContent = label;
+    btn.dataset.month = key;
+    btn.onclick = () => toggleMonthTab(key, btn);
+    container.appendChild(btn);
+  });
+}
+
+function toggleMonthTab(monthKey, btnEl) {
+  if(selectedMonths.has(monthKey)){
+    selectedMonths.delete(monthKey);
+    btnEl.classList.remove('active');
+  } else {
+    selectedMonths.add(monthKey);
+    btnEl.classList.add('active');
+  }
+  renderActivityList();
+}
+
+function renderActivityList() {
+  const container = document.getElementById('activityContainer');
+  if(!selectedMonths.size){
+    container.innerHTML='<div style="font-size:12px;color:#bbb;text-align:center;padding:20px 0">Select a month above to view trade activity</div>';
+    updateWeekHint(); return;
+  }
+  // Sort selected months and render all weeks
+  const sortedMonths = [...selectedMonths].sort();
+  let html = '';
+  sortedMonths.forEach(monthKey => {
+    const weeks = Object.entries(TRADE_CAL).filter(([wc]) => wc.startsWith(monthKey));
+    const d = new Date(monthKey+'-01');
+    const monthLabel = d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    html += `<div style="font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin:${html?'14px':0} 0 6px">${monthLabel}</div><div class="activity-list">`;
+    weeks.forEach(([wc, info]) => {
+      const dw = new Date(wc);
+      const dayLabel = dw.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      const isSelected = selectedWeeks.has(wc);
+      const cls = ['activity-item', isSelected?'selected':'', info.payday?'payday-item':''].filter(Boolean).join(' ');
+      html += `<div class="${cls}" onclick="toggleWeek('${wc}',this)">
+        <div class="ai-check"></div>
+        <span class="ai-date">${dayLabel}</span>
+        <div style="flex:1">
+          <div class="ai-theme">${info.theme}</div>
+          ${info.event?`<div class="ai-event">${info.event}</div>`:''}
+        </div>
+        ${info.payday?'<span class="ai-payday">PAYDAY</span>':''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  updateWeekHint();
+}
+
+function toggleWeek(wc, el) {
+  if(selectedWeeks.has(wc)){selectedWeeks.delete(wc);el.classList.remove('selected');}
+  else{selectedWeeks.add(wc);el.classList.add('selected');}
+  updateWeekHint();
+}
+
+function updateWeekHint() {
+  const hint = document.getElementById('selWeeksHint');
+  if(selectedWeeks.size>0){
+    hint.style.display='block';
+    hint.textContent = `${selectedWeeks.size} week${selectedWeeks.size>1?'s':''} selected — continue to add products`;
+  } else {
+    hint.style.display='none';
+  }
+}
+
+// ── Product toggle ──
+const NAMES = {
+  bannerstrip:'Banner strip', brandblock:'Brand block', brandrail:'Brand rail', hpstrip:'Homepage USP bar', hero:'Homepage hero',
+  searchcontent:'Search content block', catads:'Category ads (Gold)', catsilver:'Category ads (Silver)', catbronze:'Category ads (Bronze)', pdpcomp:'PDP competitor ad',
+  checkout:'Checkout banner', postcheckout:'Post-checkout pop-up', orderconf:'Order confirmation banner',
+  emailsolus:'Solus email', emailbau:'BAU email banners', emailauto:'Automated emails', emailpost:'Post purchase emails'
+};
+
+function toggle(id) {
+  const card = document.getElementById('card-'+id);
+  if(sel[id]){delete sel[id];card.classList.remove('sel');}
+  else{sel[id]={id,name:NAMES[id],price:getBasePrice(id),weeks:1};card.classList.add('sel');}
+  renderSidebar();
+}
+
+function getBasePrice(id) {
+  const prices = {bannerstrip:5500,brandblock:5500,brandrail:5500,hpstrip:5500,hero:7500,searchcontent:5500,pdpcomp:12000,checkout:5500,postcheckout:5500,orderconf:8000,emailsolus:5500,emailbau:6000,emailauto:6000,emailpost:6000,catads:3000,catsilver:2000,catbronze:1000};
+  return prices[id]||5500;
+}
+
+function calcTotal(id, base) {
+  const qtyEl = document.getElementById('qty-'+id);
+  const qty = qtyEl ? parseInt(qtyEl.value) : 1;
+  const pdEl = document.getElementById('pd-'+id);
+  const paydayExtra = pdEl && pdEl.checked ? 1000 : 0;
+  const total = (base * qty) + paydayExtra;
+  const hintEl = document.getElementById('hint-'+id);
+  const wc = document.getElementById('week-'+id) ? document.getElementById('week-'+id).value : '';
+  if(hintEl && wc){
+    const d = new Date(wc);
+    hintEl.textContent = `${qty} week${qty>1?'s':''} from w/c ${d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · £${total.toLocaleString()} total${paydayExtra?' (incl. £1,000 payday premium)':''}`;
+  }
+  if(sel[id]){sel[id].price=total;sel[id].weeks=qty;renderSidebar();}
+}
+
+function spMonths(id, ppm) {
+  const sm = document.getElementById('start-'+id).value;
+  const em = document.getElementById('end-'+id) ? document.getElementById('end-'+id).value : sm;
+  if(!sm) return;
+  const months = em ? Math.max(1,Math.round((new Date(em+'-01')-new Date(sm+'-01'))/(1000*60*60*24*30.44))+1) : 1;
+  const total = ppm===12000 ? 12000 : ppm*months;
+  const hintEl = document.getElementById('hint-'+id);
+  if(hintEl) hintEl.textContent = ppm===12000 ? 'Year-long placement · £12,000 fixed' : `${months} month${months>1?'s':''} · £${total.toLocaleString()} total`;
+  if(sel[id]){sel[id].price=total;sel[id].months=months;renderSidebar();}
+}
+
+function heroDate() {
+  const s = document.getElementById('start-hero').value;
+  if(!s) return;
+  const d = new Date(s); d.setDate(d.getDate()+1);
+  document.getElementById('hint-hero').textContent = `2-day slot: ${s} – ${d.toISOString().slice(0,10)}`;
+  if(sel['hero']){sel['hero'].startDate=s;sel['hero'].endDate=d.toISOString().slice(0,10);renderSidebar();}
+}
+
+function weekChanged(id) {
+  const wc = document.getElementById('week-'+id).value;
+  if(!wc) return;
+  const info = TRADE_CAL[wc];
+  const themeEl = document.getElementById('theme-'+id);
+  const pdToggle = document.getElementById('pd-toggle-'+id);
+  if(themeEl && info) themeEl.value = info.theme||'';
+  if(pdToggle) pdToggle.style.display = info && info.payday ? 'flex' : 'none';
+  calcTotal(id, getBasePrice(id));
+}
+
+function renderSidebar() {
+  const items = Object.values(sel);
+  const brand = document.getElementById('brandName').value;
+  document.getElementById('brandBadge').textContent = brand||'';
+  const empty=document.getElementById('sb-empty'), sbItems=document.getElementById('sb-items'), sbTotals=document.getElementById('sb-totals');
+  if(!items.length){empty.style.display='flex';sbItems.style.display='none';sbTotals.style.display='none';return;}
+  empty.style.display='none';sbItems.style.display='block';sbTotals.style.display='block';
+  let html='', total=0;
+  items.forEach(i=>{
+    total+=i.price;
+    const sub=i.startDate?`${i.startDate}${i.endDate?' – '+i.endDate:''}`:(i.weeks>1?`${i.weeks} weeks`:'');
+    html+=`<div class="sbitem"><div style="flex:1"><div class="sbi-name">${i.name}</div>${sub?`<div class="sbi-sub">${sub}</div>`:''}</div><span class="sbi-price">£${i.price.toLocaleString()}</span><button class="sbi-rm" onclick="removeItem('${i.id}')">×</button></div>`;
+  });
+  sbItems.innerHTML=html;
+  document.getElementById('subtot').textContent='£'+total.toLocaleString();
+  document.getElementById('grandtot').textContent='£'+total.toLocaleString();
+  updateBudgetStatus(total);
+  document.getElementById('genBtn').disabled=false;
+  document.getElementById('subBtn').disabled=false;
+}
+
+function removeItem(id) {
+  delete sel[id];
+  document.getElementById('card-'+id).classList.remove('sel');
+  renderSidebar();
+}
+
+function updateBudgetStatus(totalGBP) {
+  const budgetEl=document.getElementById('budgetInput');
+  const budget=budgetEl?parseInt(budgetEl.value):0;
+  const items=Object.values(sel);
+  if(totalGBP===undefined) totalGBP=items.reduce((s,i)=>s+i.price,0);
+  const bstat=document.getElementById('bstat');
+  if(!bstat) return;
+  if(!budget||!items.length){bstat.className='bstat bs-neutral';bstat.textContent='Enter budget above to track spend';return;}
+  const diff=budget-totalGBP;
+  if(diff>=0){bstat.className='bstat bs-ok';bstat.textContent=diff===0?`Exactly matches £${budget.toLocaleString()} budget`:`£${diff.toLocaleString()} remaining of £${budget.toLocaleString()}`;}
+  else{bstat.className='bstat bs-over';bstat.textContent=`£${Math.abs(diff).toLocaleString()} over £${budget.toLocaleString()} budget`;}
+}
+
+function buildReview() {
+  const brand=document.getElementById('brandName').value||'(no brand)';
+  const poc=document.getElementById('pocSelect').options[document.getElementById('pocSelect').selectedIndex].text;
+  const items=Object.values(sel);
+  const total=items.reduce((s,i)=>s+i.price,0);
+  const rc=document.getElementById('review-content');
+  if(!items.length){rc.innerHTML='<span style="color:#bbb">No products selected. Go back to step 3 to add products.</span>';return;}
+  let rows=items.map(i=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f4f8;font-size:13px"><span style="color:var(--text);font-weight:500">${i.name}</span><span style="font-weight:700;color:var(--navy)">£${i.price.toLocaleString()}</span></div>`).join('');
+  rc.innerHTML=`<div style="margin-bottom:12px;padding:10px;background:var(--surface);border-radius:7px;font-size:12px;line-height:1.8"><strong>Brand:</strong> ${brand}<br><strong>PoC:</strong> ${poc}<br><strong>Season:</strong> ${getSelectedSeasons()}<br><strong>Weeks selected:</strong> ${selectedWeeks.size}</div>${rows}<div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:15px;font-weight:700;border-top:2px solid var(--border);margin-top:4px"><span>Total</span><span style="color:var(--navy)">£${total.toLocaleString()}</span></div>`;
+}
+
+function generateProposal() {
+  const brand=document.getElementById('brandName').value||'Brand';
+  const poc=document.getElementById('pocSelect').options[document.getElementById('pocSelect').selectedIndex].text;
+  const season=getSelectedSeasons();
+  const notes=document.getElementById('campaignNotes').value;
+  const items=Object.values(sel);
+  const total=items.reduce((s,i)=>s+i.price,0);
+  const lines=items.map(i=>`• ${i.name}: £${i.price.toLocaleString()}${i.startDate?' ('+i.startDate+(i.endDate?' – '+i.endDate:'')+')':''}`).join('\n');
+  const ref='SS-RM-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const body=`RETAIL MEDIA PROPOSAL BRIEF\n\nRef: ${ref}\nBrand: ${brand}\nPoC: ${poc}\nSeason: ${season}\nTotal investment: £${total.toLocaleString()}\nObjective: ${notes||'N/A'}\n\nCAMPAIGN PLAN\n${lines}\n\nPlease generate PPTX proposal from this brief.\n\nSubmitted: ${new Date().toLocaleString('en-GB')}`;
+  window.location.href=`mailto:${EKOW}?subject=${encodeURIComponent('Proposal brief — '+brand+' ['+ref+']')}&body=${encodeURIComponent(body)}`;
+  document.getElementById('refNo').textContent=ref;
+  document.getElementById('confBdm').textContent=poc;
+  document.getElementById('soverlay').classList.add('show');
+}
+
+function doSubmit() {
+  const brand=document.getElementById('brandName').value||'Brand';
+  const poc=document.getElementById('pocSelect').options[document.getElementById('pocSelect').selectedIndex].text;
+  const season=getSelectedSeasons();
+  const notes=document.getElementById('campaignNotes').value;
+  const items=Object.values(sel);
+  const total=items.reduce((s,i)=>s+i.price,0);
+  if(!items.length){alert('Please select at least one product.');return;}
+  const lines=items.map(i=>`• ${i.name}: £${i.price.toLocaleString()}${i.startDate?' ('+i.startDate+(i.endDate?' – '+i.endDate:'')+')':i.weeks>1?' ('+i.weeks+' weeks)':''}`).join('\n');
+  const ref='SS-RM-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000);
+  const body=`RETAIL MEDIA CAMPAIGN SUBMISSION\n\nRef: ${ref}\nBrand: ${brand}\nPoC: ${poc}\nSeason: ${season}\nBudget: £${document.getElementById('budgetInput').value||'not set'}\nTotal selected: £${total.toLocaleString()}\nObjective: ${notes||'N/A'}\n\nCAMPAIGN PLAN\n${lines}\n\nSubmitted: ${new Date().toLocaleString('en-GB')}`;
+  window.location.href=`mailto:${EKOW}?subject=${encodeURIComponent('Campaign submission — '+brand+' ['+ref+']')}&body=${encodeURIComponent(body)}`;
+  document.getElementById('refNo').textContent=ref;
+  document.getElementById('confBdm').textContent=poc;
+  document.getElementById('soverlay').classList.add('show');
+}
+
+function handleCalUpload(event) {
+  const file=event.target.files[0];
+  if(!file) return;
+  document.querySelector('.upload-zone p').innerHTML=`<span style="color:var(--green);font-weight:500">✓ ${file.name} uploaded — calendar refreshed</span>`;
+}
+
+function populateWeekSelects() {
+  const weeks=Object.keys(TRADE_CAL).sort();
+  let opts='<option value="">Select a week</option>';
+  weeks.forEach(wc=>{
+    const d=new Date(wc);
+    const label=`w/c ${d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}${TRADE_CAL[wc].payday?' ⭐ PAYDAY':''}`;
+    opts+=`<option value="${wc}">${label}</option>`;
+  });
+  ['bannerstrip','brandblock','brandrail','hpstrip','searchcontent','checkout','postcheckout','orderconf','emailbau','emailauto','emailpost'].forEach(id=>{
+    const el=document.getElementById('week-'+id);
+    if(el) el.innerHTML=opts;
+  });
+}
+
+function populateMonthSelects() {
+  const now=new Date(2026,4,1);
+  let opts='';
+  for(let i=0;i<20;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()+i,1);
+    const val=d.toISOString().slice(0,7);
+    const label=d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    opts+=`<option value="${val}">${label}</option>`;
+  }
+  ['catads','catsilver','catbronze','pdpcomp'].forEach(id=>{
+    const s=document.getElementById('start-'+id);
+    const e=document.getElementById('end-'+id);
+    if(s) s.innerHTML=opts;
+    if(e) e.innerHTML=opts;
+  });
+}
+
+// ── Init ──
+buildMonthTabs();
+populateWeekSelects();
+populateMonthSelects();
+</script>
+</body>
+</html>
